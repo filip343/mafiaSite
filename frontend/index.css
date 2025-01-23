@@ -3,7 +3,7 @@ html{
 }
 body{
     margin:0;
-    padding-top: 20%;
+    padding-top: 20vh;
     box-sizing: border-box;
     height: 100vh;
     width: 100vw;
@@ -31,5 +31,6 @@ input{
     margin-bottom: 10%;
 }
 button{
+    margin-bottom: 2%;
     height: 10%;
 }

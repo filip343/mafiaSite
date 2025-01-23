@@ -1,7 +1,8 @@
 const buttonJoin = document.getElementById("join")
+const buttonCreate = document.getElementById("create")
 const codeInput =document.getElementById("code")
 const nameInput = document.getElementById("username")
-var joined = false
+
 function getSessionTokenFromCookies() {
     const cookies = document.cookie.split("; ");
     for (let cookie of cookies) {
@@ -10,12 +11,12 @@ function getSessionTokenFromCookies() {
             if(token!=="")
             return token;
             else
-            return null
+            return ""
         }
     }
-    return null;
+    return ""
 }
-const sessionToken = getSessionTokenFromCookies()
+var sessionToken = getSessionTokenFromCookies()
 console.log(`session token: ${sessionToken}`)
 
 const socket = io("ws://localhost:8080",{
@@ -25,11 +26,12 @@ const socket = io("ws://localhost:8080",{
     }
 )
 
-socket.once("tokenValidation",(data)=>{
-    console.log(data.token_status)
-})
-const onJoin = ()=>{
-    //window.location="/frontend/waitroom.html"
+const onJoin = (roomName,username)=>{
+    sessionStorage.setItem("roomName",roomName)
+    sessionStorage.setItem("username",username)
+
+    sessionToken = getSessionTokenFromCookies()
+    window.location="/frontend/waitroom.html"
 }
 
 buttonJoin.addEventListener("click",()=>{
@@ -51,9 +53,37 @@ buttonJoin.addEventListener("click",()=>{
         const join_status = obj.join_status
         const token = obj.token
         document.cookie = `session_token=${token};` 
+        
         if(join_status===200){
-            onJoin()
-            joined=true
+            onJoin(roomName,username)
+        }
+        console.log(obj.message);
+    
+    })
+})
+
+buttonCreate.addEventListener("click",()=>{
+    var roomName = codeInput.value
+    var username = nameInput.value
+    if(!roomName){
+        alert("You must fill a code input")
+        return
+    }
+    if(!username){
+        alert("You must fill a username input")
+        return
+    }
+
+    socket.emit('createRoom',roomName,username,sessionToken)
+
+    socket.once("roomCreateResponse",(data)=>{ 
+        const obj = data
+        const join_status = obj.create_status
+        const token = obj.token
+        document.cookie = `session_token=${token};` 
+        
+        if(join_status===200){
+            onJoin(roomName,username)
         }
         console.log(obj.message);
     
