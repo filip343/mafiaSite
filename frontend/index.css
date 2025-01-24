@@ -11,9 +11,35 @@ body{
     align-items: start;
     justify-content: center;
 }
-div{
+.hide{
+    opacity: 0;
+}
+div#container{
+    height:max-content;
+    position: absolute;
+}
+div#pickType{
+    position: absolute;
+    display: flex;
+    height: 2rem;
+    width: max-content;
+    top:-2rem;
+}
+div#pickType button{
+    border: none;
+    border-radius: 1rem 1rem 0 0;
+    background-color: rgb(166, 213, 216);
+    height: 100%;
+    text-align: center;
+    padding-bottom: 12%;
+    width: 100px;
+}
+div#pickType .picked{
+    background-color:rgb(50, 210, 221) ;
+}
+div#form{
     padding: 3%;
-    border-radius:10px;
+    border-radius:0 10px 10px 10px;
     background-color: rgb(50, 210, 221);
     display: flex;
     flex-direction: column;
@@ -30,7 +56,7 @@ input{
     font-size: 1.2rem;
     margin-bottom: 10%;
 }
-button{
+div#form button{
     margin-bottom: 2%;
     height: 10%;
 }

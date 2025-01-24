@@ -7,14 +7,19 @@
     <link rel="stylesheet" href="index.css"/>
 </head>
 <body>
-    <div>
-        <h1>MAFIA GAME</h1>
-        <label>code</label>
-        <input type="text" id="code"/>
-        <label>username</label>
-        <input type="text" id="username"/>
-        <button id="join">JOIN</button>
-        <button id="create">CREATE</button>
+    <div id="container">
+        <div id="pickType">
+            <button id="join" class="picked">Join</button>
+            <button id="create">Create</button>
+        </div>
+        <div id="form">
+            <h1>MAFIA GAME</h1>
+            <label>code</label>
+            <input type="text" id="code"/>
+            <label>username</label>
+            <input type="text" id="username"/>
+            <button id="join">JOIN</button>
+        </div>
     </div>
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
     <script src="index.js"></script>
