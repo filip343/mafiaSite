@@ -1,4 +1,10 @@
-const numPlayersLabel = document.getElementById("numPlayers")
+import { saveSessionTokenToCookies } from "./tokenHandler.js";
+
+var numPlayersLabel = document.querySelector("label#numPlayers")
+const body = document.querySelector("body")
+
+
+var startButton = document.querySelector("button#start")
 function getSessionTokenFromCookies() {
     const cookies = document.cookie.split("; ");
     for (let cookie of cookies) {
@@ -9,30 +15,51 @@ function getSessionTokenFromCookies() {
     return null;
 }
 function updateUsers(users){
-    numPlayersLabel.innerText = users.length
+    numPlayersLabel = document.querySelector("label#numPlayers")
+    numPlayersLabel.innerHTML = users.length
+
 }
 const sessionToken = getSessionTokenFromCookies() 
 
-console.log("session Token:",sessionToken)
 if(!sessionToken){
     window.location = "/frontend/index.html"
-    
 }
-const socket = io("ws://localhost:8080",{
-    query:{
-        token:sessionToken
-    }
-})
+
+var socket;
+const establishConnection = (token)=>{
+    socket = io("ws://localhost:8080",{
+        auth:{
+            token:token
+        }
+    })
+}
+establishConnection(sessionToken)
 const roomName = sessionStorage.getItem("roomName")
 const username = sessionStorage.getItem("username")
+
+socket.on("reusedToken",()=>{
+    saveSessionTokenToCookies("")
+    establishConnection("")
+})
 
 socket.emit('joinRoom',roomName,username,sessionToken)
 socket.once("roomJoinResponse",(data)=>{
     const token = data.token
     const users = data.users
-    document.cookie = `session_token=${token};` 
+    saveSessionTokenToCookies(token)
+    console.log(data)
     updateUsers(users)
     
+})
+socket.on("adminPriv",()=>{
+    body.innerHTML += `
+    <button id="start">START</button>
+    `
+    startButton = document.querySelector("button#start")
+    startButton.addEventListener('click',()=>{
+        const sessionToken = getSessionTokenFromCookies() 
+        socket.emit("start",sessionToken)
+    })
 })
 socket.on("updateUsers",(data)=>{
     updateUsers(data)

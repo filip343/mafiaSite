@@ -9,6 +9,8 @@ import { Socket } from "socket.io";
  * @typedef {Object} RoomProps
  * @property {string} adminToken
  * @property {string[]} users
+ * @property {number} maxNumPlay
+ * @property {number} numOfMaf
  * @property {boolean} started
  */
 
@@ -25,21 +27,22 @@ import { Socket } from "socket.io";
  * @returns {string}
  */
 export const roomJoin = (roomName,username,sessionToken,socket,roomData)=>{
-        const validation = validateRoomJoin(roomName,sessionToken,username,socket.id,roomData)
-        var val_stat = validation.status
-        var token
-        if(val_stat===200){
-            socket.join(roomName)
-            token = onRoomJoin(socket,roomName,username,sessionToken,roomData)
-        }
-        var response ={
-            join_status:val_stat,
-            message:validation.message,
-            token:token,
-            users:getUserByRoom(roomName)
-        } 
-        socket.emit("roomJoinResponse",response)
-        return token
+    const validation = validateRoomJoin(roomName,sessionToken,username,socket.id,roomData)
+    var val_stat = validation.status
+    var token
+    if(val_stat===200){
+        socket.join(roomName)
+        token = onRoomJoin(socket,roomName,username,sessionToken,roomData)
+    }
+    var response ={
+        join_status:val_stat,
+        message:validation.message,
+        token:token,
+        users:getUserByRoom(roomName)
+    } 
+    socket.emit("roomJoinResponse",response)
+
+    return token
 }
 
 /**
@@ -95,8 +98,13 @@ const validateRoomJoin = (roomName,sessionToken,username,socketId,roomData)=>{
                 responseObj.message = "user with that username already in game"
                 return responseObj
             }
-        })
-        
+        })   
+    }
+    const playerCount = roomData[roomName].users.length 
+    
+    if(playerCount>=roomData[roomName].maxNumPlay){
+        responseObj.status = 400
+        responseObj.message = "The room is full"
     }
     
     return responseObj
@@ -113,8 +121,14 @@ const validateRoomJoin = (roomName,sessionToken,username,socketId,roomData)=>{
  */
 const onRoomJoin = (socket,roomName,username,sessionToken,roomData)=>{
     var token
-    if(getUserByToken(sessionToken)){
+    const user = getUserByToken(sessionToken)
+    if(user){
         token = sessionToken
+        const adminToken = roomData[roomName].adminToken
+        const adminUser = getUserByToken(adminToken)
+        if(adminUser === user){
+            socket.emit("adminPriv")
+        }
     }else{
         token = addUser(username,roomName,socket.id)
         roomData[roomName].users.push(token)

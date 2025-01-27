@@ -1,6 +1,6 @@
 import consts from "./consts.js"
 import { getSessionTokenFromCookies, saveSessionTokenToCookies } from "../tokenHandler.js"
-const MIN_NUM_OF_PLAYERS = consts.MAX_NUM_OF_PLAYERS
+const MIN_NUM_OF_PLAYERS = consts.MIN_NUM_OF_PLAYERS
 const MIN_NUM_OF_MAFIA = consts.MIN_NUM_OF_MAFIA
 const MAX_NUM_OF_PLAYERS = consts.MAX_NUM_OF_PLAYERS 
 const MAX_NUM_OF_MAFIA = consts.MAX_NUM_OF_MAFIA
@@ -56,8 +56,8 @@ export const addListenersToCreateForm = (socket,onJoin)=>{
 export const handleButtonCreateClick = (socket,onJoin)=>{
     var roomName = codeInput.value
     var username = nameInput.value
-    var maxNumPlay = MIN_NUM_OF_PLAYERS+Math.max(0,Math.round(numMafInput.value*(MAX_NUM_OF_MAFIA-MIN_NUM_OF_MAFIA)/100))
-    var numOfMaf = MIN_NUM_OF_MAFIA+Math.max(0,Math.round(numPlayInput.value*(MAX_NUM_OF_PLAYERS-MIN_NUM_OF_PLAYERS)/100))
+    var maxNumPlay = MIN_NUM_OF_PLAYERS+Math.max(0,Math.round(numPlayInput.value*(MAX_NUM_OF_PLAYERS-MIN_NUM_OF_PLAYERS)/100))
+    var numOfMaf = MIN_NUM_OF_MAFIA+Math.max(0,Math.round(numMafInput.value*(MAX_NUM_OF_MAFIA-MIN_NUM_OF_MAFIA)/100))
     if(!roomName || !username || !maxNumPlay || !numOfMaf){
         alert("You must fill all inputs")
         return
@@ -73,7 +73,7 @@ export const handleButtonCreateClick = (socket,onJoin)=>{
     }
 
     var sessionToken = getSessionTokenFromCookies()
-    socket.emit('createRoom',roomName,username,sessionToken)
+    socket.emit('createRoom',createRoomObj,sessionToken)
 
     socket.once("roomCreateResponse",(data)=>{ 
         const obj = data
@@ -83,8 +83,9 @@ export const handleButtonCreateClick = (socket,onJoin)=>{
         
         if(join_status===200){
             onJoin(roomName,username)
+        }else{
+            alert(obj.message)
         }
-        console.log(obj.message);
     
     })
 }

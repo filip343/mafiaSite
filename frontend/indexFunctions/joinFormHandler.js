@@ -29,8 +29,8 @@ export const addListenersToJoinForm = (socket,onJoin)=>{
 }
 
 export const handleButtonJoinClick = (socket,onJoin)=>{
-    var roomName = codeInput.value
-    var username = nameInput.value
+    const roomName = codeInput.value.trim()
+    const username = nameInput.value.trim()
     if(!roomName){
         alert("You must fill a code input")
         return
@@ -39,7 +39,7 @@ export const handleButtonJoinClick = (socket,onJoin)=>{
         alert("You must fill a username input")
         return
     }
-    var sessionToken = getSessionTokenFromCookies()
+    const sessionToken = getSessionTokenFromCookies()
 
     socket.emit('joinRoom',roomName,username,sessionToken)
 
@@ -51,8 +51,9 @@ export const handleButtonJoinClick = (socket,onJoin)=>{
         
         if(join_status===200){
             onJoin(roomName,username)
+        }else{
+            alert(obj.message)
         }
-        console.log(obj.message);
     
     })
 }

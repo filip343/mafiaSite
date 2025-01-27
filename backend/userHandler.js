@@ -10,13 +10,14 @@
 /**
  * @type UserDictionary
  */
+import {v4 as uuidv4} from "uuid"
 var users = {}
 
 export const logUsers = ()=>{
     console.log(users)
 }
 const generateSessionToken = () => {
-    return Math.random().toString(36).substr(2); // Random token
+    return uuidv4()
 }
 /**
  * @param {string} token
@@ -58,9 +59,9 @@ export const addUser=(username,roomName,socketId)=>{
  * @param {string} sessionToken
  * @return {void}
  */
-export const removeUserByToken = (sessionToken)=>{
-    if(Object.keys(users).includes(sessionToken)){
-        delete users[sessionToken]
+export const removeUserByToken = (token)=>{
+    if(Object.keys(users).includes(token)){
+        delete users[token]
     }
 }
 /**
@@ -68,7 +69,7 @@ export const removeUserByToken = (sessionToken)=>{
  * @return {void}
  */
 export const removeSocketIdByToken =(token)=>{
-    if(users[token]){
+    if(Object.keys(users).includes(token)){
         users[token].socketId = null
     }
 }
@@ -78,5 +79,7 @@ export const removeSocketIdByToken =(token)=>{
  * @return {void}
  */
 export const addSocketIdByToken = (token,socketId)=>{
-    users[token].socketId = socketId
+    if(Object.keys(users).includes(token)){
+        users[token].socketId = socketId
+    }
 }
