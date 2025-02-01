@@ -1,5 +1,3 @@
-import { getUserByToken,addUser,logUsers, getUserByRoom} from "./userHandler.js";
-import { Socket } from "socket.io";
 /**
  * @typedef {Object} ValidationResult
  * @property {number} status - The status of the validation.
@@ -17,6 +15,9 @@ import { Socket } from "socket.io";
 /**
  * @typedef {Object.<string,RoomProps>} RoomData
  */
+
+import { getUserByToken,addUser,logUsers, getUserByRoom} from "./userHandler.js";
+import { Socket } from "socket.io";
 
 /** 
  * @param {string} roomName  
@@ -61,11 +62,17 @@ const validateRoomJoin = (roomName,sessionToken,username,socketId,roomData)=>{
         return responseObj
     }
     if(sessionToken){
+        console.log(sessionToken);
         
         const user = getUserByToken(sessionToken)
         if(!user){
             responseObj.status = 200
             responseObj.message = "user with given sessionToken not found proceed to add sessionToken"
+            if(roomData[roomName].started){
+                responseObj.status = 400
+                responseObj.message = "Room already started playing"
+                return responseObj
+            }
         }else if(user.socketId!==socketId){
             if(user.roomName!==roomName){
                 responseObj.status = 400
@@ -90,6 +97,11 @@ const validateRoomJoin = (roomName,sessionToken,username,socketId,roomData)=>{
             }
         })
     }else{
+        if(roomData[roomName].started){
+            responseObj.status = 400
+            responseObj.message = "Room already started playing"
+            return responseObj
+        }
         roomData[roomName].users.forEach(user=>{
             const foundUser = getUserByToken(user)
 

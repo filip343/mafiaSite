@@ -1,19 +1,10 @@
-import { saveSessionTokenToCookies } from "./tokenHandler.js";
+import { saveSessionTokenToCookies,getSessionTokenFromCookies } from "./tokenHandler.js";
 
 var numPlayersLabel = document.querySelector("label#numPlayers")
 const body = document.querySelector("body")
 
 
 var startButton = document.querySelector("button#start")
-function getSessionTokenFromCookies() {
-    const cookies = document.cookie.split("; ");
-    for (let cookie of cookies) {
-        if (cookie.startsWith("session_token=")) {
-            return cookie.split("=")[1];
-        }
-    }
-    return null;
-}
 function updateUsers(users){
     numPlayersLabel = document.querySelector("label#numPlayers")
     numPlayersLabel.innerHTML = users.length
@@ -27,11 +18,7 @@ if(!sessionToken){
 
 var socket;
 const establishConnection = (token)=>{
-    socket = io("ws://localhost:8080",{
-        auth:{
-            token:token
-        }
-    })
+    socket = io(`ws://localhost:8080?token=${token}`)
 }
 establishConnection(sessionToken)
 const roomName = sessionStorage.getItem("roomName")
@@ -47,7 +34,11 @@ socket.once("roomJoinResponse",(data)=>{
     const token = data.token
     const users = data.users
     saveSessionTokenToCookies(token)
-    console.log(data)
+    if(data.join_status!==200){
+        alert(data.message)
+        window.location = "/frontend/index.html"
+    }
+    
     updateUsers(users)
     
 })
@@ -59,12 +50,21 @@ socket.on("adminPriv",()=>{
     startButton.addEventListener('click',()=>{
         const sessionToken = getSessionTokenFromCookies() 
         socket.emit("start",sessionToken)
+        socket.once("roomStartResponse",(response)=>{
+            if(response.join_status!==200){
+                alert(response.message)
+            }
+        })
     })
 })
 socket.on("updateUsers",(data)=>{
+    console.log(data)
     updateUsers(data)
+})
+socket.on("gameStarted",(data)=>{
+    console.log(data)
 })
 socket.on("roomDelete",()=>{
     alert("Your room got deleted, sorry :( ")
-    window.location = "index.html"
+    window.location = "/frontend/index.html"
 })

@@ -1,6 +1,3 @@
-import { getUserByToken,addUser} from "./userHandler.js";
-import { Socket } from "socket.io";
-import consts from "./consts.js";
 /**
  * @typedef {Object} ValidationResult
  * @property {number} status - The status of the validation.
@@ -33,6 +30,10 @@ import consts from "./consts.js";
  * @param {RoomData} roomData
  * @returns {string}
  */
+import { getUserByToken,addUser} from "./userHandler.js";
+import { Socket } from "socket.io";
+import consts from "../consts.js";
+
 const MIN_NUM_OF_PLAYERS = consts.MIN_NUM_OF_PLAYERS
 const MIN_NUM_OF_MAFIA = consts.MIN_NUM_OF_MAFIA
 const MAX_NUM_OF_PLAYERS = consts.MAX_NUM_OF_PLAYERS 
@@ -52,7 +53,6 @@ export const roomCreate= (roomCreateObj,sessionToken,socket,roomData)=>{
         message:validation.message,
         token:token
     } 
-    console.log("new token",token)
     socket.emit("roomCreateResponse",response)
     return token
 }

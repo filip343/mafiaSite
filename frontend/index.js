@@ -8,11 +8,7 @@ const buttonFormTypeCreate = document.querySelector("div#pickType #create")
 const sessionToken = getSessionTokenFromCookies()
 var socket;
 const establishConnection = (token)=>{
-    socket = io("ws://localhost:8080",{
-        auth:{
-            token:token
-        }
-    })
+    socket = io(`ws://localhost:8080?token=${token}`)
 }
 establishConnection(sessionToken)
 const main = ()=>{
@@ -28,6 +24,7 @@ socket.on("reusedToken",()=>{
 const onJoin = (roomName,username)=>{
     sessionStorage.setItem("roomName",roomName)
     sessionStorage.setItem("username",username)
+    socket.emit("perserveConnection")
     window.location="/frontend/waitroom.html"
 }
 main()

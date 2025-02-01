@@ -1,4 +1,4 @@
-import consts from "./consts.js"
+import consts from "../../consts.js"
 import { getSessionTokenFromCookies, saveSessionTokenToCookies } from "../tokenHandler.js"
 const MIN_NUM_OF_PLAYERS = consts.MIN_NUM_OF_PLAYERS
 const MIN_NUM_OF_MAFIA = consts.MIN_NUM_OF_MAFIA
@@ -25,11 +25,11 @@ export const loadCreateForm = (socket,onJoin)=>{
             <label>username</label>
             <input type="text" id="username"/>
             <label>Maximum number of players</label>
-            <label id="numOfPlay">5</label>
-            <input type="range" id="numOfPlay" value="1"/> 
+            <label id="numOfPlay">${MIN_NUM_OF_PLAYERS}</label>
+            <input type="range" id="numOfPlay" value="0"/> 
             <label>Number of mafias</label>
-            <label id="numOfMaf">1</label>
-            <input type="range" id="numOfMaf" value="1"/> 
+            <label id="numOfMaf">${MIN_NUM_OF_MAFIA}</label>
+            <input type="range" id="numOfMaf" value="0"/> 
             <button id="create">CREATE</button>
     ` 
     buttonCreate = document.querySelector("div#form #create")
@@ -80,7 +80,6 @@ export const handleButtonCreateClick = (socket,onJoin)=>{
         const join_status = obj.create_status
         const token = obj.token
         saveSessionTokenToCookies(token)
-        
         if(join_status===200){
             onJoin(roomName,username)
         }else{

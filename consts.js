@@ -1,6 +1,6 @@
 export default{
     MIN_NUM_OF_MAFIA:1,
-    MIN_NUM_OF_PLAYERS:5,
+    MIN_NUM_OF_PLAYERS:3,
     MAX_NUM_OF_MAFIA:8,
     MAX_NUM_OF_PLAYERS:40
 }
